@@ -1,6 +1,8 @@
 from fastapi import FastAPI
 import uvicorn
 import os
+import platform
+import subprocess
 
 app = FastAPI()
 
@@ -18,8 +20,15 @@ async def create_file_cmd(filename: str = None, content: str = None):
     for s in """/ '"!;|&\\""":
         if s in name:
             return {"message": "В имени файла используются запрещенные символы, удалите их и попробуйте снова!"}
-    with open(filename, "w") as file:
-         file.write(content)
+    if os.path.exists(filename):
+        return {"message": f"Файл {filename} уже существует!"}
+    else:
+        if platform.system() == "Linux":
+            subprocess.run(f"touch {filename}", shell=True)
+            subprocess.run(f"echo {content} > {filename}", shell=True)
+        else:
+            with open(filename, "w") as file:
+                 file.write(content)
     return {"message": f"Файл {filename} успешно создан!"}
 
 uvicorn.run(app, host="127.0.0.1", port=8002)
