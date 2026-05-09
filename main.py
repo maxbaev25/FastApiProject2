@@ -30,5 +30,3 @@ async def create_file_cmd(filename: str = None, content: str = None):
             with open(filename, "w") as file:
                  file.write(content)
     return {"message": f"Файл {filename} успешно создан!"}
-
-uvicorn.run(app, host="127.0.0.1", port=8002)
