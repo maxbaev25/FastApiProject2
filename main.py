@@ -8,7 +8,7 @@ app = FastAPI()
 
 
 @app.get("/create_file")
-async def create_file_cmd(filename: str = None, content: str = None):
+async def create_file(filename: str = None, content: str = None):
     # общие проверки
     if filename is None or filename == "." or filename == "..":
         return {"message": "Имя файла не указано!"}
