@@ -1,0 +1,39 @@
+name: Issue Job
+on:
+  issue:
+    types:
+      - opened
+jobs:
+  issue_job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+
+      - name: Install Requests
+        run: pip install requests
+
+      - name: Comment
+        env:
+          GITVERSE_TOKEN: ${{ secrets.GITVERSE_TOKEN }}
+          OWNER: ${{ github.repository_owner }}
+          REPO: ${{ github.event.repository.name }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+        run: |
+          python -c "
+          import os, requests;
+          token = os.getenv('GITVERSE_TOKEN');
+          owner = os.getenv('OWNER');
+          repo = os.getenv('REPO');
+          issue_number = os.getenv('ISSUE_NUMBER');
+          url = f'https://api.gitverse.ru/repos/{owner}/{repo}/issues/{issue_number}/comments';
+          headers = {
+              'Authorization': f'Bearer {token}',
+              'Accept': 'application/vnd.gitverse.object+json;version=1',
+              'Content-Type': 'application/json'
+          };
+          data = {'body': 'Автоответчик ответил'};
+          response = requests.post(url, headers=headers, json=data);
+          "
